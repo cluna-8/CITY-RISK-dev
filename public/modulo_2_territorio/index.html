@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 2 - Inteligencia Territorial</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- Mapbox GL JS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+
+    <style>
+        body {
+            background: white;
+            padding: 20px 40px;
+            display: block;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .map-section {
+            height: 100%;
+            min-height: 550px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        #map-territorio {
+            width: 100%;
+            height: 100%;
+        }
+
+        .input-card {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-soft);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-h);
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--text-p);
+            background: white;
+        }
+
+        .projection-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-left: 4px solid var(--brand-accent);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .projection-val {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brand-primary);
+        }
+
+        .kml-dropzone {
+            border: 2px dashed #cbd5e1;
+            padding: 25px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .kml-dropzone:hover {
+            border-color: var(--brand-accent);
+            background: rgba(2, 132, 199, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-grid">
+        <div class="form-section">
+            <div>
+                <h2 style="margin-bottom: 4px;">2. Inteligencia Territorial</h2>
+                <p style="color: var(--text-meta);">City Bio: Demografía, Densidad y Organización Física.</p>
+            </div>
+
+            <!-- Población -->
+            <div class="input-card">
+                <label>Población Total (Último Censo)</label>
+                <input type="number" id="poblacionInput" placeholder="Ej: 150000" oninput="calculateProjection()">
+
+                <div id="projectionResult" class="projection-box">
+                    <p style="font-size: 0.8rem; color: var(--text-p); margin-bottom: 5px;">📍 Proyección Poblacional
+                        (10 años):</p>
+                    <div class="projection-val" id="popVal">0</div>
+                    <small style="color: var(--text-meta);">Basado en tasa de crecimiento regional estimada.</small>
+                </div>
+            </div>
+
+            <!-- Mapa / KML -->
+            <div class="input-card">
+                <label>Límites Municipales (KML / GeoJSON)</label>
+                <div class="kml-dropzone" id="kmlDrop">
+                    <p style="color: var(--brand-primary); font-weight: 500;">📂 Arrastrar límites territoriales</p>
+                    <small style="color: var(--text-meta);">Se usará para calcular la densidad habitacional.</small>
+                </div>
+            </div>
+
+            <!-- Nivel Socioeconómico -->
+            <div class="input-card">
+                <label>Nivel Socioeconómico (NSE) Predominante</label>
+                <select id="nseSelect">
+                    <option value="">Seleccione Estrato...</option>
+                    <option value="bajo">Bajo (Vulnerable)</option>
+                    <option value="medio-bajo">Medio-Bajo</option>
+                    <option value="medio">Medio</option>
+                    <option value="medio-alto">Medio-Alto</option>
+                    <option value="alto">Alto (Premium)</option>
+                </select>
+            </div>
+
+            <div class="glass-terminal" id="terminal-t">
+                <div class="api-line"><span class="api-time">[SYSTEM]</span> Ready to process spatial data.</div>
+            </div>
+        </div>
+
+        <div class="map-section">
+            <div id="map-territorio"></div>
+            <div
+                style="position: absolute; bottom: 20px; left: 20px; background: rgba(15, 23, 42, 0.8); color: white; padding: 10px 15px; border-radius: 8px; font-size: 0.8rem; backdrop-filter: blur(4px); z-index: 1;">
+                <div style="display: flex; flex-direction: column; gap: 5px;">
+                    <div>📏 Superficie: <span id="areaVal">0</span> km²</div>
+                    <div>👥 Densidad: <span id="densidadVal">0</span> hab/km²</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils/map-logic.js"></script>
+    <script>
+        const terminal = document.getElementById('terminal-t');
+
+        function logT(service, message) {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'api-line fade-in';
+            div.innerHTML = `<span class="api-time">[${time}]</span> <span style="font-weight:700">${service}</span>: ${message}`;
+            terminal.prepend(div);
+        }
+
+        function calculateProjection() {
+            const pop = parseInt(document.getElementById('poblacionInput').value);
+            const box = document.getElementById('projectionResult');
+            const val = document.getElementById('popVal');
+
+            if (pop > 0) {
+                box.style.display = 'block';
+                // Simulación de crecimiento: ~1.2% anual (Argentina promedio)
+                const projected = Math.round(pop * Math.pow(1.012, 10));
+                val.innerText = projected.toLocaleString();
+
+                logT('MATH-ENGINE', `Calculando pirámide poblacional proyectada para ${pop} habitantes.`);
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        // Simulación de Densidad al elegir NSE para demostración visual
+        document.getElementById('nseSelect').addEventListener('change', function () {
+            if (this.value) {
+                logT('DATABASE', `Cargando estratos históricos para NSE: ${this.value.toUpperCase()}`);
+            }
+        });
+
+        window.onload = () => {
+            initCityRiskMap('map-territorio', [-58.3816, -34.6037], 11);
+            logT('GEO-ENGINE', 'Visor cartográfico cargado con estilo Navigation Day.');
+        };
+    </script>
+</body>
+
+</html>

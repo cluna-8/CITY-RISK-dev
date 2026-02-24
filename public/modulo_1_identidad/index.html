@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 1 - Identidad Institucional</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- Mapbox GL JS -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+
+    <style>
+        body {
+            background: white;
+            padding: 20px 40px;
+            display: block;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .map-section {
+            height: 100%;
+            min-height: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #cbd5e1;
+            /* Borde más sólido para contraste */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        #map-module {
+            width: 100%;
+            height: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-h);
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            font-size: 1rem;
+            color: var(--text-p);
+            background: white;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .status-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--brand-success);
+        }
+
+        .status-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #D97706;
+        }
+
+        .file-drop-area {
+            border: 2px dashed var(--border-soft);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            background: var(--bg-light);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .scan-line {
+            height: 2px;
+            background: var(--brand-accent);
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-shadow: 0 0 10px var(--brand-accent);
+            animation: scan 2s infinite linear;
+            display: none;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-grid">
+        <!-- Columna Izquierda: Formulario e Identidad -->
+        <div class="form-section">
+            <div>
+                <h2 style="margin-bottom: 4px;">1. Identidad Institucional</h2>
+                <p style="color: var(--text-meta);">Validación soberana de jurisdicción argentina.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Provincia</label>
+                <select id="provinciaSelect" onchange="loadMunicipios()">
+                    <option value="">Cargando provincias...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Municipio</label>
+                <select id="municipioSelect" onchange="syncMapWithMuni()">
+                    <option value="">Seleccione una provincia...</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Correo Institucional</label>
+                <input type="email" id="govEmail" placeholder="intendencia@municipio.gov.ar">
+                <div id="emailStatus" class="status-badge"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Acta de Nombramiento (PDF)</label>
+                <input type="file" id="pdfInput" accept=".pdf" style="display: none;">
+                <div class="file-drop-area" id="dropArea">
+                    <div class="scan-line" id="scanLine"></div>
+                    <div id="dropText">
+                        <p style="color: var(--brand-primary); font-weight: 500;">📂 Seleccionar o Arrastrar Acta (PDF)
+                        </p>
+                        <p style="font-size: 0.8rem; color: var(--text-meta)" id="fileNameDisplay">Solo formatos PDF
+                            permitidos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monitor Glassmorphism -->
+            <div class="glass-terminal" id="terminal">
+                <div class="api-line"><span class="api-time">[SYSTEM]</span> Ready.</div>
+            </div>
+        </div>
+
+        <!-- Columna Derecha: El Mapa Light -->
+        <div class="map-section">
+            <div id="map-module"></div>
+            <div
+                style="position: absolute; top: 15px; right: 15px; background: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; box-shadow: var(--shadow-soft); z-index: 1;">
+                LIVE GEOREF
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils/map-logic.js"></script>
+    <script>
+        const terminal = document.getElementById('terminal');
+        const pdfInput = document.getElementById('pdfInput');
+        const dropArea = document.getElementById('dropArea');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        let muniData = [];
+
+        function logAPI(service, message, status = 'INFO') {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'api-line fade-in';
+            div.innerHTML = `<span class="api-time">[${time}]</span> <span style="font-weight:700; color: ${status === 'ERROR' ? '#ef4444' : '#38bdf8'}">${service}</span>: ${message}`;
+            terminal.prepend(div);
+        }
+
+        async function loadProvincias() {
+            logAPI('GEOREF', 'Solicitando provincias...');
+            try {
+                const response = await fetch('https://apis.datos.gob.ar/georef/api/provincias');
+                const data = await response.json();
+                const select = document.getElementById('provinciaSelect');
+                select.innerHTML = '<option value="">Seleccione Provincia...</option>';
+                data.provincias.sort((a, b) => a.nombre.localeCompare(b.nombre)).forEach(p => {
+                    const opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.text = p.nombre;
+                    select.add(opt);
+                });
+                logAPI('GEOREF', '24 Provincias listas.');
+            } catch (e) { logAPI('SYSTEM', 'Error de conexión API.', 'ERROR'); }
+        }
+
+        async function loadMunicipios() {
+            const id = document.getElementById('provinciaSelect').value;
+            const select = document.getElementById('municipioSelect');
+            if (!id) return;
+            logAPI('GEOREF', 'Buscando municipios...');
+            try {
+                const response = await fetch(`https://apis.datos.gob.ar/georef/api/municipios?provincia=${id}&max=500`);
+                const data = await response.json();
+                muniData = data.municipios;
+                select.innerHTML = '<option value="">Seleccione Municipio...</option>';
+                muniData.sort((a, b) => a.nombre.localeCompare(b.nombre)).forEach(m => {
+                    const opt = document.createElement('option');
+                    opt.value = m.id;
+                    opt.text = m.nombre;
+                    select.add(opt);
+                });
+            } catch (e) { logAPI('SYSTEM', 'Error municipios.', 'ERROR'); }
+        }
+
+        function syncMapWithMuni() {
+            const id = document.getElementById('municipioSelect').value;
+            const muni = muniData.find(m => m.id == id);
+            if (muni) {
+                logAPI('MAPBOX', `Centrando en ${muni.nombre}...`);
+                fetch(`https://apis.datos.gob.ar/georef/api/municipios?id=${id}`)
+                    .then(r => r.json())
+                    .then(d => {
+                        const c = d.municipios[0].centroide;
+                        flyToLocation(c.lon, c.lat, muni.nombre);
+                    });
+            }
+        }
+
+        // Dropzone Logic
+        dropArea.addEventListener('click', () => pdfInput.click());
+
+        pdfInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.type !== 'application/pdf') {
+                logAPI('FILE-AUTH', `Error: El archivo "${file.name}" no es PDF.`, 'ERROR');
+                fileNameDisplay.innerText = "❌ Error: Solo se permiten archivos PDF.";
+                fileNameDisplay.style.color = "#ef4444";
+                pdfInput.value = ''; // Reset
+                return;
+            }
+
+            // Start Simulation
+            startAuditSimulation(file.name);
+        });
+
+        function startAuditSimulation(name) {
+            const dropArea = document.getElementById('dropArea');
+            if (dropArea.classList.contains('processing')) return;
+
+            dropArea.classList.add('processing');
+            document.getElementById('scanLine').style.display = 'block';
+            fileNameDisplay.innerText = `Procesando: ${name}...`;
+            fileNameDisplay.style.color = "var(--text-meta)";
+
+            logAPI('DOC-AI', `Escaneando: ${name}...`);
+
+            setTimeout(() => {
+                logAPI('AWS-TEXTRACT', 'Extrayendo firmas y sellos institucionales...');
+                setTimeout(() => {
+                    logAPI('SUMSUB-KYB', 'Cruce de identidad con Registro Nacional.', 'OK');
+                    document.getElementById('scanLine').style.display = 'none';
+                    document.getElementById('dropText').innerHTML = `
+                        <p style="color:var(--brand-success); font-weight: 600;">✓ Verificación Exitosa</p>
+                        <p style="font-size: 0.75rem; color: var(--text-meta);">${name}</p>
+                    `;
+                    dropArea.classList.remove('processing');
+                }, 1500);
+            }, 1000);
+        }
+
+        // Email validation
+        document.getElementById('govEmail').addEventListener('input', function () {
+            const email = this.value;
+            const status = document.getElementById('emailStatus');
+            const isGov = /\.go[bv](\.[a-z]{2})?$/i.test(email);
+            if (email) {
+                status.style.display = 'inline-flex';
+                status.className = isGov ? 'status-badge status-success' : 'status-badge status-warning';
+                status.innerText = isGov ? '✓ Validado' : '⚠️ Auditoría Manual';
+            }
+        });
+
+        window.onload = () => {
+            loadProvincias();
+            initCityRiskMap('map-module');
+        };
+    </script>
+</body>
+
+</html>

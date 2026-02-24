@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  cityrisk-frontend:
+    build:
+      context: .
+      dockerfile: servidor/Dockerfile
+    ports:
+      - "8080:80"
+    volumes:
+      - ./public:/usr/share/nginx/html
+    restart: always
+
+  cityrisk-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    restart: always
+

@@ -1,0 +1,301 @@
+/* Diseño visual general adaptado a Institución / Fintech / Govtech */
+:root {
+    --brand-primary: #0056B3;
+    /* Azul Institucional Oscuro */
+    --brand-accent: #0284c7;
+    /* Azul Claro Tecnológico */
+    --brand-success: #10B981;
+    /* Verde BID / Validado */
+
+    --bg-light: #F8FAFC;
+    --bg-white: #FFFFFF;
+
+    --text-h: #1E293B;
+    /* Títulos Oscuros */
+    --text-p: #475569;
+    /* Párrafos Suaves */
+    --text-meta: #94A3B8;
+
+    --border-soft: #E2E8F0;
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-elevated: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-p);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+h1,
+h2,
+h3 {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-h);
+}
+
+/* El Contenedor del Wizard Principal */
+.wizard-container {
+    width: 100%;
+    max-width: 1100px;
+    height: 90vh;
+    background: var(--bg-white);
+    border-radius: 12px;
+    box-shadow: var(--shadow-elevated);
+    border: 1px solid var(--border-soft);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Encabezado Institucional */
+.wizard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-soft);
+    background: #ffffff;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-accent));
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 86, 179, 0.3);
+}
+
+.wizard-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.wizard-header h1 span {
+    font-weight: 400;
+    color: var(--text-meta);
+}
+
+.header-meta {
+    font-size: 0.85rem;
+    color: var(--brand-primary);
+    background: rgba(0, 86, 179, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* Barra del Stepper */
+.stepper {
+    padding: 24px 48px;
+    background: var(--bg-light);
+    border-bottom: 1px solid var(--border-soft);
+}
+
+.stepper ul {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    list-style: none;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.step.active {
+    opacity: 1;
+}
+
+.step.completed .step-circle {
+    background: var(--brand-success);
+    color: white;
+    border-color: var(--brand-success);
+}
+
+.step-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--border-soft);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+    color: var(--text-meta);
+    transition: all 0.3s ease;
+}
+
+.step.active .step-circle {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(0, 86, 179, 0.1);
+}
+
+.step-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.step-connector {
+    flex-grow: 1;
+    height: 2px;
+    background: var(--border-soft);
+    margin: 0 16px;
+    margin-top: -24px;
+}
+
+/* Área de Contenido */
+.wizard-content {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background: white;
+}
+
+.content-wrapper {
+    height: 100%;
+}
+
+.module-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Estado Inicial Hero */
+.welcome-hero {
+    text-align: center;
+    padding-top: 10%;
+}
+
+.welcome-hero h2 {
+    font-size: 2.2rem;
+    margin-bottom: 16px;
+    color: var(--text-h);
+}
+
+.welcome-hero p {
+    font-size: 1.1rem;
+    color: var(--text-p);
+    max-width: 600px;
+    margin: 0 auto 32px auto;
+    line-height: 1.6;
+}
+
+/* Botones */
+.btn {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--brand-primary);
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 86, 179, 0.3);
+}
+
+.btn-primary:hover {
+    background: #004494;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: white;
+    color: var(--text-p);
+    border: 1px solid var(--border-soft);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-light);
+    color: var(--text-h);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Footer / Controles */
+.wizard-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 24px 32px;
+    border-top: 1px solid var(--border-soft);
+    background: var(--bg-light);
+}
+
+/* Ocultador general para transiciones */
+.fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Glassmorphism Terminal for API Monitoring */
+.glass-terminal {
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 10px;
+    font-family: 'Fira Code', monospace;
+    font-size: 0.75rem;
+    color: #38bdf8;
+    height: 120px;
+    overflow-y: hidden;
+    position: relative;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+}
+
+.glass-terminal::before {
+    content: "API LIVE MONITOR";
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-size: 0.6rem;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 1px;
+}
