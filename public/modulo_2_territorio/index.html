@@ -12,6 +12,9 @@
     <!-- Mapbox GL JS -->
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    <!-- Turf.js para análisis espacial y togeojson para KML -->
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+    <script src='https://unpkg.com/@mapbox/togeojson@0.16.0/togeojson.js'></script>
 
     <style>
         body {
@@ -128,9 +131,12 @@
             <!-- Mapa / KML -->
             <div class="input-card">
                 <label>Límites Municipales (KML / GeoJSON)</label>
-                <div class="kml-dropzone" id="kmlDrop">
-                    <p style="color: var(--brand-primary); font-weight: 500;">📂 Arrastrar límites territoriales</p>
-                    <small style="color: var(--text-meta);">Se usará para calcular la densidad habitacional.</small>
+                <input type="file" id="geoInput" accept=".kml,.json,.geojson" style="display: none;">
+                <div class="kml-dropzone" id="kmlDrop" onclick="document.getElementById('geoInput').click()">
+                    <p style="color: var(--brand-primary); font-weight: 500;" id="dropTitle">📂 Arrastrar límites
+                        territoriales</p>
+                    <small style="color: var(--text-meta);" id="dropSubtitle">Se usará para calcular la densidad
+                        habitacional.</small>
                 </div>
             </div>
 
@@ -201,9 +207,143 @@
         });
 
         window.onload = () => {
-            initCityRiskMap('map-territorio', [-58.3816, -34.6037], 11);
-            logT('GEO-ENGINE', 'Visor cartográfico cargado con estilo Navigation Day.');
+            const savedLon = localStorage.getItem('cityRisk_muniLon');
+            const savedLat = localStorage.getItem('cityRisk_muniLat');
+            const savedName = localStorage.getItem('cityRisk_muniName');
+
+            if (savedLon && savedLat) {
+                const center = [parseFloat(savedLon), parseFloat(savedLat)];
+                initCityRiskMap('map-territorio', center, 12);
+                setTimeout(() => {
+                    flyToLocation(center[0], center[1], savedName || 'Ubicación Seleccionada');
+                    logT('GEO-ENGINE', `Contexto cargado: ${savedName}.`);
+                }, 1000);
+            } else {
+                initCityRiskMap('map-territorio', [-58.3816, -34.6037], 11);
+                logT('GEO-ENGINE', 'Visor cartográfico cargado (Ubicación por defecto: CABA).');
+            }
+
+            // Configurar Input de Archivos
+            setupFileHandlers();
         };
+
+        function setupFileHandlers() {
+            const dropzone = document.getElementById('kmlDrop');
+            const input = document.getElementById('geoInput');
+
+            // Drag and drop events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            dropzone.addEventListener('drop', handleDrop, false);
+            input.addEventListener('change', (e) => handleFiles(e.target.files));
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            const file = files[0];
+            if (!file) return;
+
+            logT('FILE-SYSTEM', `Procesando archivo: ${file.name}`);
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const content = e.target.result;
+                let geojson;
+
+                try {
+                    if (file.name.endsWith('.kml')) {
+                        const parser = new DOMParser();
+                        const kml = parser.parseFromString(content, 'text/xml');
+                        geojson = toGeoJSON.kml(kml);
+                        logT('GEO-ENGINE', 'KML convertido a GeoJSON exitosamente.');
+                    } else {
+                        geojson = JSON.parse(content);
+                    }
+                    processGeoJSON(geojson, file.name);
+                } catch (err) {
+                    logT('ERROR', 'No se pudo procesar el archivo espacial.', 'ERROR');
+                    console.error(err);
+                }
+            };
+
+            reader.readAsText(file);
+        }
+
+        function processGeoJSON(data, name) {
+            if (!map) return;
+
+            // Limpiar capa anterior si existe
+            if (map.getLayer('muni-fill')) map.removeLayer('muni-fill');
+            if (map.getLayer('muni-outline')) map.removeLayer('muni-outline');
+            if (map.getSource('muni-geom')) map.removeSource('muni-geom');
+
+            map.addSource('muni-geom', {
+                'type': 'geojson',
+                'data': data
+            });
+
+            map.addLayer({
+                'id': 'muni-fill',
+                'type': 'fill',
+                'source': 'muni-geom',
+                'paint': {
+                    'fill-color': '#0284c7',
+                    'fill-opacity': 0.1
+                }
+            });
+
+            map.addLayer({
+                'id': 'muni-outline',
+                'type': 'line',
+                'source': 'muni-geom',
+                'paint': {
+                    'line-color': '#0284c7',
+                    'line-width': 3,
+                    'line-dasharray': [2, 1]
+                }
+            });
+
+            // Ajustar vista y calcular área
+            const bbox = turf.bbox(data);
+            map.fitBounds(bbox, { padding: 50 });
+
+            const areaSqM = turf.area(data);
+            const areaSqKm = (areaSqM / 1000000).toFixed(2);
+            document.getElementById('areaVal').innerText = areaSqKm;
+
+            // Actualizar UI
+            document.getElementById('dropTitle').innerText = `✓ ${name}`;
+            document.getElementById('dropSubtitle').innerText = "Geometría cargada correctamente.";
+
+            logT('GEO-ENGINE', `Superficie detectada: ${areaSqKm} km²`);
+            updateDensity();
+        }
+
+        function updateDensity() {
+            const pop = parseInt(document.getElementById('poblacionInput').value);
+            const area = parseFloat(document.getElementById('areaVal').innerText);
+
+            if (pop > 0 && area > 0) {
+                const density = Math.round(pop / area);
+                document.getElementById('densidadVal').innerText = density.toLocaleString();
+                logT('MATH-ENGINE', `Densidad calculada: ${density} hab/km²`);
+            }
+        }
+
+        // Vincular input de población con densidad
+        document.getElementById('poblacionInput').addEventListener('input', updateDensity);
     </script>
 </body>
 

@@ -41,6 +41,11 @@ function viewDashboard() {
 
 function resetWizard() {
     currentStep = 0;
+    // Limpiar persistencia al reiniciar
+    localStorage.removeItem('cityRisk_muniName');
+    localStorage.removeItem('cityRisk_muniLon');
+    localStorage.removeItem('cityRisk_muniLat');
+
     document.querySelector('.stepper').style.display = 'block';
     document.getElementById('wizard-controls').style.display = 'none';
     const container = document.getElementById('module-container');

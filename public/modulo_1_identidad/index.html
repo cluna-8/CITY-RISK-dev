@@ -246,6 +246,11 @@
                     .then(r => r.json())
                     .then(d => {
                         const c = d.municipios[0].centroide;
+                        // Guardar en persistencia para los siguientes módulos
+                        localStorage.setItem('cityRisk_muniName', muni.nombre);
+                        localStorage.setItem('cityRisk_muniLon', c.lon);
+                        localStorage.setItem('cityRisk_muniLat', c.lat);
+                        
                         flyToLocation(c.lon, c.lat, muni.nombre);
                     });
             }
