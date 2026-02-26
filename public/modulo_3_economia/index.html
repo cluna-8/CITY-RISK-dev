@@ -5,38 +5,394 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo 3 - Solvencia Económica</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            padding: 30px;
             background: white;
-            color: #334155;
+            padding: 20px 40px;
+            display: block;
         }
 
-        h2 {
-            color: #0284c7;
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .analysis-section {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 30px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .currency-toggle {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
             margin-bottom: 10px;
         }
 
-        .module-card {
-            border: 1px dashed #cbd5e1;
-            padding: 20px;
+        .currency-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .currency-btn.active-toggle {
+            background: white;
+            color: var(--brand-primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .input-card {
+            background: var(--bg-light);
+            padding: 15px;
             border-radius: 8px;
+            border: 1px solid var(--border-soft);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-h);
+            font-size: 0.85rem;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            color: var(--text-p);
+            background: white;
+            box-sizing: border-box;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #f1f5f9;
+        }
+
+        .metric-val {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 10px 0;
+            font-family: 'Outfit', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        #currentScoreTier {
+            line-height: 1;
+            margin: 15px 0;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            50% {
+                transform: translateX(5px);
+            }
+
+            75% {
+                transform: translateX(-5px);
+            }
+
+            100% {
+                transform: translateX(0);
+            }
+        }
+
+        .positive {
+            color: #10b981;
+        }
+
+        .negative {
+            color: #ef4444;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+        }
+
+        .glass-terminal {
             margin-top: 20px;
+            max-height: 150px;
+        }
+
+        /* Tooltip Styles */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            background: #e2e8f0;
+            color: #64748b;
+            border-radius: 50%;
+            font-size: 0.7rem;
+            cursor: help;
+            margin-left: 5px;
+            position: relative;
+            vertical-align: middle;
+            transition: all 0.2s;
+        }
+
+        .info-icon:hover {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        .exchange-tooltip {
+            visibility: hidden;
+            width: 180px;
+            background-color: #1e293b;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 10px;
+            position: absolute;
+            z-index: 100;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -90px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+        }
+
+        .exchange-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1e293b transparent transparent transparent;
+        }
+
+        .info-icon:hover .exchange-tooltip {
+            visibility: visible;
+            opacity: 1;
         }
     </style>
 </head>
 
 <body>
-    <h2>Módulo 3: Solvencia Económica (Billetera Pública)</h2>
-    <p>Núcleo financiero que determina el atractivo para grandes constructoras y bancos.</p>
+    <div class="main-grid">
+        <div class="form-section">
+            <div>
+                <h2 style="margin-bottom: 4px;">3. Solvencia Económica</h2>
+                <p style="color: var(--text-meta);">Declaración de Presupuesto Anual y Salud Financiera.</p>
+            </div>
 
-    <div class="module-card">
-        <h3>Zona de Trabajo</h3>
-        <p>Aquí desarrollaremos el formulario de presupuesto y la conexión vía API para conversiones a USD/EUR y
-            triangulación fiscal.</p>
+            <div class="input-card" style="width: 200px;">
+                <label>Año Fiscal</label>
+                <select id="budgetYear">
+                    <option value="2024">2024 (Presupuestado)</option>
+                    <option value="2023">2023 (Ejecutado)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <div class="input-card">
+                    <label>Ingresos Totales (ARS)</label>
+                    <input type="number" id="revenueInput" placeholder="Ej: 500000000"
+                        oninput="calculateFinancialMetrics()">
+                    <small style="color: #94a3b8; font-size: 0.7rem;">Tasas locales + Coparticipación.</small>
+                </div>
+                <div class="input-card">
+                    <label>Gastos Corrientes (ARS)</label>
+                    <input type="number" id="expensesInput" placeholder="Ej: 350000000"
+                        oninput="calculateFinancialMetrics()">
+                    <small style="color: #94a3b8; font-size: 0.7rem;">Sueldos, servicios y mantenimiento.</small>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <div class="input-card">
+                    <label>Inversión de Capital (Real)</label>
+                    <input type="number" id="investmentInput" placeholder="Ej: 80000000"
+                        oninput="calculateFinancialMetrics()">
+                    <small style="color: #94a3b8; font-size: 0.7rem;">Obra pública y equipamiento.</small>
+                </div>
+                <div class="input-card">
+                    <label>Deuda Pública (Anual)</label>
+                    <input type="number" id="debtInput" placeholder="Ej: 20000000"
+                        oninput="calculateFinancialMetrics()">
+                    <small style="color: #94a3b8; font-size: 0.7rem;">Amortización e intereses.</small>
+                </div>
+            </div>
+
+            <div class="glass-terminal" id="terminal-e">
+                <div class="api-line"><span class="api-time">[SYSTEM]</span> Financial engine initialization... OK.
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h3 style="margin-top: 0; font-size: 1.1rem; color: #1e293b;">🕵️ Análisis en Tiempo Real</h3>
+
+            <div class="currency-toggle">
+                <button id="currencyToggleBtn" class="currency-btn" onclick="toggleInternationalView()">Ver en
+                    USD/EUR</button>
+            </div>
+
+            <div id="deficitAlert"
+                style="display: none; background: #fee2e2; border: 1px solid #ef4444; border-radius: 8px; padding: 15px; margin-bottom: 5px; animation: shake 0.5s;">
+                <div
+                    style="display: flex; gap: 10px; align-items: center; color: #b91c1c; font-weight: 700; font-size: 0.9rem;">
+                    <span>⚠️ ALERTA DE DÉFICIT</span>
+                </div>
+                <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #991b1b;">Se requiere un ajuste de <span
+                        class="alert-amount"></span> para equilibrar balances.</p>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">City Risk Score (Financiero)</div>
+                <div class="metric-val" id="currentScoreTier" style="font-size: 3.5rem; color: var(--brand-primary);">--
+                </div>
+                <small style="color: #64748b;">Calificación institucional estimada.</small>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Coeficiente de Solvencia (α)</div>
+                <div class="metric-val" id="alphaCoefficientVal" style="color: #6366f1;">1.0</div>
+                <small style="color: #64748b;">Ajuste por validación externa.</small>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Balance Primario</div>
+                <div class="metric-val" id="primaryBalanceVal">$ 0,00</div>
+                <small id="balanceDesc" style="color: #64748b;">Pendiente de datos...</small>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Capacidad de Inversión</div>
+                <div class="metric-val" id="capacityVal" style="color: #0284c7;">0%</div>
+                <progress id="capacityBar" value="0" max="100"
+                    style="width: 100%; height: 8px; border-radius: 4px; overflow: hidden;"></progress>
+            </div>
+
+            <div style="background: #eff6ff; padding: 15px; border-radius: 8px; border: 1px solid #bfdbfe;">
+                <p style="margin: 0; font-size: 0.85rem; color: #1e40af; line-height: 1.4;">
+                    <strong>Info BID:</strong> Un balance primario mayor al 15% es requisito para líneas de crédito
+                    directo por infraestructura.
+                </p>
+            </div>
+
+            <button onclick="runRemoteValidation()"
+                style="width: 100%; padding: 14px; background: #1e293b; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                Validar ante Entidad Internacional
+            </button>
+
+            <div id="solvencySeal" style="display: none; margin-top: 10px;">
+                <!-- Result Badge will be injected here -->
+            </div>
+        </div>
     </div>
+
+    <script src="../js/utils/economy-logic.js"></script>
+    <script>
+        const terminal = document.getElementById('terminal-e');
+
+        function logE(service, message) {
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = 'api-line fade-in';
+            div.innerHTML = `<span class="api-time">[${time}]</span> <span style="font-weight:700">${service}</span>: ${message}`;
+            terminal.prepend(div);
+
+            // Limit terminal lines
+            if (terminal.children.length > 5) {
+                terminal.removeChild(terminal.lastChild);
+            }
+        }
+
+        // Overriding the default logic update to include UI-specific feedback
+        const originalCalc = calculateFinancialMetrics;
+        calculateFinancialMetrics = function () {
+            originalCalc();
+
+            const pbVal = parseFloat(document.getElementById('revenueInput').value || 0) -
+                parseFloat(document.getElementById('expensesInput').value || 0);
+
+            const desc = document.getElementById('balanceDesc');
+            if (pbVal > 0) {
+                desc.innerText = "Superávit saludable.";
+                desc.style.color = "#10b981";
+            } else if (pbVal < 0) {
+                desc.innerText = "Déficit detected. Revisar gastos.";
+                desc.style.color = "#ef4444";
+            }
+
+            const capVal = parseFloat(document.getElementById('capacityVal').innerText);
+            document.getElementById('capacityBar').value = capVal > 0 ? capVal : 0;
+        };
+
+        window.onload = loadSavedFinancials;
+    </script>
 </body>
 
 </html>
