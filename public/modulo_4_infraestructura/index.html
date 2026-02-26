@@ -4,38 +4,342 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 4 - Infraestructura y Servicios</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>City Risk - Infraestructura y Servicios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            padding: 30px;
-            background: white;
-            color: #334155;
+        :root {
+            --brand-primary: #0284c7;
+            --brand-secondary: #0ea5e9;
+            --bg-glass: rgba(255, 255, 255, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.3);
+            --text-main: #1e293b;
+            --text-meta: #64748b;
         }
 
-        h2 {
-            color: #0284c7;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .header {
+            grid-column: 1 / -1;
             margin-bottom: 10px;
         }
 
-        .module-card {
-            border: 1px dashed #cbd5e1;
+        .header h1 {
+            font-size: 1.8rem;
+            color: var(--brand-primary);
+            font-weight: 700;
+        }
+
+        .glass-card {
+            background: var(--bg-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-glass);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05),
+                0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-group {
+            margin-bottom: 30px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .slider-label {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .slider-value {
+            font-weight: 700;
+            color: var(--brand-primary);
+            background: #e0f2fe;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--brand-primary);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .analytics-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .score-box {
+            text-align: center;
             padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
+            background: #f1f5f9;
+            border-radius: 15px;
+        }
+
+        .score-val {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--brand-primary);
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-meta);
+            margin-top: 5px;
+        }
+
+        .risk-alert {
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .nav-buttons {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-prev {
+            background: #f1f5f9;
+            color: var(--text-main);
+        }
+
+        .btn-next {
+            background: var(--brand-primary);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 
 <body>
-    <h2>Módulo 4: Infraestructura y Servicios (El Semáforo)</h2>
-    <p>Visualiza dónde existen oportunidades de inversión técnica.</p>
+    <div class="main-container">
+        <header class="header">
+            <h1>Módulo 4: Infraestructura y Servicios</h1>
+            <p style="color: var(--text-meta);">Gestión de brechas y potencial de inversión técnica.</p>
+        </header>
 
-    <div class="module-card">
-        <h3>Zona de Trabajo</h3>
-        <p>Aquí diseñaremos los sliders de cobertura, el gráfico de radar automático y cruce de datos.</p>
+        <div class="glass-card">
+            <h3 class="section-title">🛠️ Cobertura de Servicios</h3>
+
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">Agua Potable</span>
+                    <span class="slider-value" id="waterVal">80%</span>
+                </div>
+                <input type="range" id="waterSlider" min="0" max="100" value="80">
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">Cloacas / Saneamiento</span>
+                    <span class="slider-value" id="sewageVal">65%</span>
+                </div>
+                <input type="range" id="sewageSlider" min="0" max="100" value="65">
+            </div>
+
+            <div class="slider-group">
+                <div class="slider-header">
+                    <span class="slider-label">Conectividad (Fibra Óptica)</span>
+                    <span class="slider-value" id="fiberVal">40%</span>
+                </div>
+                <input type="range" id="fiberSlider" min="0" max="100" value="40">
+            </div>
+
+            <div style="background: #f0f9ff; padding: 15px; border-radius: 12px; border: 1px solid #bae6fd;">
+                <p style="font-size: 0.85rem; color: #0369a1; line-height: 1.4;">
+                    <strong>Nota Técnica:</strong> El índice de infraestructura pondera servicios básicos sobre
+                    conectividad digital.
+                </p>
+            </div>
+        </div>
+
+        <div class="glass-card analytics-panel">
+            <h3 class="section-title">📊 Análisis del Semáforo</h3>
+
+            <div style="display: flex; justify-content: center; margin-bottom: -10px;">
+                <span id="reputationBadge"
+                    style="display: none; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; border: 1px solid; transition: all 0.3s;"></span>
+            </div>
+
+            <div class="score-box">
+                <div class="score-val" id="infraScore">71%</div>
+                <div class="score-label">Índice de Infraestructura</div>
+            </div>
+
+            <div id="riskAlert" class="risk-alert">
+                Análisis en curso...
+            </div>
+
+            <!-- Botón de Auditoría OSM -->
+            <button id="osmCheckBtn" class="btn"
+                style="background: #0f172a; color: white; margin-top: 10px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;"
+                onclick="validateAgainstOSM()">
+                <span>🔍</span> Check Reality (OSM Audit)
+            </button>
+
+            <div class="chart-container">
+                <canvas id="infraRadarChart"></canvas>
+            </div>
+
+            <!-- Mini Monitor para Feedback de Auditoría -->
+            <div id="logMonitor"
+                style="background: #1e293b; color: #94a3b8; font-family: monospace; font-size: 0.65rem; padding: 10px; border-radius: 8px; max-height: 85px; overflow-y: auto; border: 1px solid #334155;">
+                <div style="color: #64748b;">[SYSTEM] Esperando auditoría externa...</div>
+            </div>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="btn btn-prev" onclick="location.href='../modulo_3_economia/index.html'">Atrás</button>
+            <button class="btn btn-next" onclick="location.href='../modulo_5_gobernanza/index.html'">Continuar</button>
+        </div>
     </div>
+
+    <script src="../js/utils/infra-logic.js"></script>
+    <script>
+        function logE(type, msg) {
+            const monitor = document.getElementById('logMonitor');
+            if (!monitor) return;
+            const colors = {
+                'NETWORK': '#60a5fa',
+                'SYSTEM': '#94a3b8',
+                'SUCCESS': '#34d399',
+                'ALERT': '#fbbf24',
+                'ERROR': '#f87171'
+            };
+            const time = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.style.marginBottom = '4px';
+            div.innerHTML = `<span style="color: #475569">[${time}]</span> <span style="color: ${colors[type] || '#fff'}; font-weight: bold;">${type}:</span> ${msg}`;
+            monitor.prepend(div);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initSliders();
+            initChart();
+            updateServiceIndex();
+        });
+
+        function initChart() {
+            const ctx = document.getElementById('infraRadarChart').getContext('2d');
+            window.infraChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Agua', 'Cloacas', 'Fibra'],
+                    datasets: [{
+                        label: 'Cobertura Actual',
+                        data: [80, 65, 40],
+                        backgroundColor: 'rgba(2, 132, 199, 0.2)',
+                        borderColor: 'rgba(2, 132, 199, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'rgba(2, 132, 199, 1)',
+                        pointBorderColor: '#fff',
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false },
+                            grid: { color: '#e2e8f0' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        function updateChart() {
+            window.infraChart.data.datasets[0].data = [
+                window.infraData.water,
+                window.infraData.sewage,
+                window.infraData.fiber
+            ];
+            window.infraChart.update();
+        }
+    </script>
 </body>
 
 </html>
