@@ -1,81 +1,149 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>City Risk - Onboarding</title>
-    <!-- Google Fonts para un diseño moderno pero sobrio (Inter y Outfit) -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <title>CITY RISK | Smart City Risk Assessment Hub</title>
+    <meta name="description"
+        content="Next-generation GovTech platform for evaluating city resilience, infrastructure, and investment risk through real-time data and 3D intelligence.">
+    <link rel="stylesheet" href="css/landing.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <div class="wizard-container">
-        <!-- Header del Marco -->
-        <header class="wizard-header">
-            <div class="logo-area">
-                <div class="logo-icon"></div>
-                <h1>City Risk <span>Gov</span></h1>
-            </div>
-            <div class="header-meta">BID Framework | Perfil Verificado</div>
-        </header>
+    <div class="bg-mesh"></div>
+    <div class="scanline"></div>
+    <div class="grid-overlay"></div>
 
-        <!-- Barra de Progreso (El "Wizard") -->
-        <nav class="stepper">
-            <ul id="step-indicators">
-                <li class="step active" data-step="1">
-                    <div class="step-circle">1</div>
-                    <span class="step-label">Identidad</span>
-                </li>
-                <li class="step-connector"></li>
-                <li class="step" data-step="2">
-                    <div class="step-circle">2</div>
-                    <span class="step-label">Territorio</span>
-                </li>
-                <li class="step-connector"></li>
-                <li class="step" data-step="3">
-                    <div class="step-circle">3</div>
-                    <span class="step-label">Economía</span>
-                </li>
-                <li class="step-connector"></li>
-                <li class="step" data-step="4">
-                    <div class="step-circle">4</div>
-                    <span class="step-label">Infraestructura</span>
-                </li>
-                <li class="step-connector"></li>
-                <li class="step" data-step="5">
-                    <div class="step-circle">5</div>
-                    <span class="step-label">Gobernanza</span>
-                </li>
-            </ul>
-        </nav>
+    <nav class="glass"
+        style="position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1.5rem 5%; display: flex; justify-content: space-between; align-items: center; border-top: none; border-left: none; border-right: none;">
+        <div class="heading-font" style="font-size: 1.5rem; letter-spacing: 2px;">
+            CITY <span style="color: var(--primary);">RISK</span>
+        </div>
+        <div style="display: flex; gap: 2rem; align-items: center;">
+            <a href="#"
+                style="color: var(--text-main); text-decoration: none; font-size: 0.9rem; font-weight: 500;">Network</a>
+            <a href="#"
+                style="color: var(--text-main); text-decoration: none; font-size: 0.9rem; font-weight: 500;">Intelligence</a>
+            <a href="wizard.html" class="btn btn-outline" style="padding: 0.6rem 1.2rem; font-size: 0.8rem;">START
+                WIZARD</a>
+        </div>
+    </nav>
 
-        <!-- Área Central Dinámica -->
-        <main class="wizard-content">
-            <div class="content-wrapper" id="module-container">
-                <!-- Por defecto cargamos primero una bienvenida y la invitación a iniciar -->
-                <div class="welcome-hero">
-                    <h2>Auditoría Paramétrica de Riesgo Municipal</h2>
-                    <p>Una herramienta diseñada para certificar la solvencia y capacidad técnica de su ciudad ante
-                        inversores y el Banco Interamericano de Desarrollo.</p>
-                    <button class="btn btn-primary" onclick="startWizard()">Comenzar Proceso de Carga</button>
-                    <button class="btn btn-secondary" onclick="viewDashboard()">Ver Tablero (Demo)</button>
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <span class="hero-tag fade-in">GOVTECH EVOLUTION</span>
+                <h1 class="hero-title fade-in">Architecting the Future of Urban Resilience</h1>
+                <p class="hero-desc fade-in">Evaluate and showcase city profiles with real-time analytics. Empowering
+                    investors and constructors with a unified risk assessment framework for the modern smart city.</p>
+
+                <div class="cta-group fade-in">
+                    <a href="wizard.html" class="btn btn-primary">
+                        <i data-lucide="shield-check"></i>
+                        Launch Evaluation
+                    </a>
+                    <a href="#features" class="btn btn-outline">
+                        <i data-lucide="component"></i>
+                        Explore Modules
+                    </a>
+                </div>
+
+                <div class="hero-image-container fade-in">
+                    <img src="assets/hero-city.png" alt="Smart City Visualization" class="hero-image">
+                    <div class="img-overlay"></div>
                 </div>
             </div>
-        </main>
+        </section>
 
-        <!-- Controles del Wizard -->
-        <footer class="wizard-footer" id="wizard-controls" style="display: none;">
-            <button class="btn btn-secondary" id="btn-prev" onclick="prevStep()" disabled>Atrás</button>
-            <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Continuar →</button>
-        </footer>
-    </div>
+        <section id="features" class="features">
+            <div class="section-header">
+                <span
+                    style="color: var(--primary); font-weight: 700; letter-spacing: 3px; font-size: 0.8rem; text-transform: uppercase;">The
+                    Core Engine</span>
+                <h2 class="section-title">Comprehensive Risk Analysis</h2>
+            </div>
 
-    <!-- Script Controlador del Módulo 0 (Wizard) -->
-    <script src="js/app.js"></script>
+            <div class="grid">
+                <!-- Module 1 -->
+                <div class="card glass">
+                    <div class="card-icon"><i data-lucide="fingerprint"></i></div>
+                    <h3 class="card-title">Institutional Identity</h3>
+                    <p class="card-text">Verification of government domains and official georeferencing. Automated
+                        audits of legal documentation via AI-driven processing.</p>
+                </div>
+                <!-- Module 2 -->
+                <div class="card glass">
+                    <div class="card-icon"><i data-lucide="map-pin"></i></div>
+                    <h3 class="card-title">Territorial Intelligence</h3>
+                    <p class="card-text">3D terrain extrusions and population projection models. Analyze urban density
+                        and expansion patterns with precision GIS data.</p>
+                </div>
+                <!-- Module 3 -->
+                <div class="card glass">
+                    <div class="card-icon"><i data-lucide="trending-up"></i></div>
+                    <h3 class="card-title">Financial Solvency</h3>
+                    <p class="card-text">Real-time budget validation and currency fluctuation tracking. Global fiscal
+                        compliance simulations for infrastructure investments.</p>
+                </div>
+                <!-- Module 4 -->
+                <div class="card glass">
+                    <div class="card-icon"><i data-lucide="zap"></i></div>
+                    <h3 class="card-title">Infrastructure Density</h3>
+                    <p class="card-text">Service coverage scoring using OpenStreetMap validation. Audit water, energy,
+                        and fiber optic accessibility across urban sectors.</p>
+                </div>
+                <!-- Module 5 -->
+                <div class="card glass">
+                    <div class="card-icon"><i data-lucide="cpu"></i></div>
+                    <h3 class="card-title">Digital Governance</h3>
+                    <p class="card-text">Assessment of municipal digitalization levels. Crowdsourced transparency
+                        validation for public-private partnerships.</p>
+                </div>
+                <!-- Global Board -->
+                <div class="card glass" style="border-color: var(--primary);">
+                    <div class="card-icon" style="background: var(--primary); color: var(--bg-darker);"><i
+                            data-lucide="layout-dashboard"></i></div>
+                    <h3 class="card-title">Investment Board</h3>
+                    <p class="card-text">A unified glassmorphism dashboard compiling outcomes from all modules into a
+                        single, comprehensive investor-ready PDF.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="glass"
+        style="padding: 4rem 2rem; text-align: center; border-bottom: none; border-left: none; border-right: none; margin-top: 5rem;">
+        <p style="color: var(--text-dim); font-size: 0.9rem;">&copy; 2026 CITY RISK. Advanced GovTech solutions for
+            high-impact urban construction.</p>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Reveal animations on scroll
+        const faders = document.querySelectorAll('.fade-in');
+        const appearOptions = {
+            threshold: 0.2,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const appearOnScroll = new IntersectionObserver(function (entries, appearOnScroll) {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.style.opacity = "1";
+                entry.target.style.transform = "translateY(0)";
+                appearOnScroll.unobserve(entry.target);
+            });
+        }, appearOptions);
+
+        faders.forEach(fader => {
+            appearOnScroll.observe(fader);
+        });
+    </script>
 </body>
 
 </html>
