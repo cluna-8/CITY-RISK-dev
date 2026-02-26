@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Risk - Onboarding</title>
+    <!-- Google Fonts para un diseño moderno pero sobrio (Inter y Outfit) -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="wizard-container">
+        <!-- Header del Marco -->
+        <header class="wizard-header">
+            <div class="logo-area">
+                <div class="logo-icon"></div>
+                <h1>City Risk <span>Gov</span></h1>
+            </div>
+            <div class="header-meta">BID Framework | Perfil Verificado</div>
+        </header>
+
+        <!-- Barra de Progreso (El "Wizard") -->
+        <nav class="stepper">
+            <ul id="step-indicators">
+                <li class="step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <span class="step-label">Identidad</span>
+                </li>
+                <li class="step-connector"></li>
+                <li class="step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <span class="step-label">Territorio</span>
+                </li>
+                <li class="step-connector"></li>
+                <li class="step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <span class="step-label">Economía</span>
+                </li>
+                <li class="step-connector"></li>
+                <li class="step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <span class="step-label">Infraestructura</span>
+                </li>
+                <li class="step-connector"></li>
+                <li class="step" data-step="5">
+                    <div class="step-circle">5</div>
+                    <span class="step-label">Gobernanza</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Área Central Dinámica -->
+        <main class="wizard-content">
+            <div class="content-wrapper" id="module-container">
+                <!-- Por defecto cargamos primero una bienvenida y la invitación a iniciar -->
+                <div class="welcome-hero">
+                    <h2>Auditoría Paramétrica de Riesgo Municipal</h2>
+                    <p>Una herramienta diseñada para certificar la solvencia y capacidad técnica de su ciudad ante
+                        inversores y el Banco Interamericano de Desarrollo.</p>
+                    <button class="btn btn-primary" onclick="startWizard()">Comenzar Proceso de Carga</button>
+                    <button class="btn btn-secondary" onclick="viewDashboard()">Ver Tablero (Demo)</button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Controles del Wizard -->
+        <footer class="wizard-footer" id="wizard-controls" style="display: none;">
+            <button class="btn btn-secondary" id="btn-prev" onclick="prevStep()" disabled>Atrás</button>
+            <button class="btn btn-primary" id="btn-next" onclick="nextStep()">Continuar →</button>
+        </footer>
+    </div>
+
+    <!-- Script Controlador del Módulo 0 (Wizard) -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
